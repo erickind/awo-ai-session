@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>AI and the future of our firm — Live Dashboard</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#ffffff;--bg2:#f7f6f2;--bg3:#f1efe8;
+  --text:#1a1a18;--text2:#5f5e5a;--text3:#888780;
+  --border:rgba(0,0,0,0.12);--border2:rgba(0,0,0,0.25);
+  --teal:#1D9E75;--purple:#7F77DD;--coral:#D85A30;
+  --amber:#BA7517;--blue:#378ADD;--teal2:#0F6E56;
+  --coral2:#993C1D;--purple2:#534AB7;--blue2:#185FA5;
+  --green:#3B6D11;--pink:#993556;--amber2:#854F0B;--red:#A32D2D;
+  --r:12px;--rs:8px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1c1c1a;--bg2:#242422;--bg3:#2c2c2a;
+    --text:#f0efe9;--text2:#b4b2a9;--text3:#888780;
+    --border:rgba(255,255,255,0.12);--border2:rgba(255,255,255,0.28);
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;}
+.page{max-width:1140px;margin:0 auto;padding:2rem 1.5rem;}
+.hdr{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:1.5rem;padding-bottom:1.25rem;border-bottom:0.5px solid var(--border);}
+.htitle{font-size:22px;font-weight:500;color:var(--text);}
+.hsub{font-size:14px;color:var(--text3);margin-top:3px;}
+.lbadge{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--text2);background:var(--bg2);padding:5px 12px;border-radius:20px;border:0.5px solid var(--border);white-space:nowrap;}
+.ldot{width:8px;height:8px;border-radius:50%;background:var(--teal);animation:pulse 2s infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.35}}
+
+.mets{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:1.5rem;}
+.met{background:var(--bg2);border-radius:var(--rs);padding:13px 15px;}
+.mlbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.mval{font-size:24px;font-weight:500;color:var(--text);line-height:1.2;}
+.mval.sm{font-size:15px;padding-top:5px;}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;}
+.qcard{background:var(--bg);border:0.5px solid var(--border);border-radius:var(--r);padding:18px;}
+.qnum{font-size:11px;font-weight:500;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;}
+.qtxt{font-size:13px;font-weight:500;color:var(--text);margin-bottom:16px;line-height:1.5;}
+.brow{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.blbl{font-size:11px;color:var(--text2);min-width:145px;max-width:145px;flex-shrink:0;text-align:right;line-height:1.35;}
+.btrk{flex:1;height:9px;background:var(--bg3);border-radius:5px;overflow:hidden;}
+.bfil{height:100%;border-radius:5px;transition:width .9s ease;}
+.bpct{font-size:11px;color:var(--text3);min-width:32px;}
+.srow2{display:flex;gap:5px;margin-bottom:6px;align-items:flex-end;}
+.scell{flex:1;text-align:center;}
+.sbar{border-radius:4px;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;min-height:4px;transition:height .9s ease;}
+.snum{font-size:10px;color:var(--text3);margin-top:4px;line-height:1.35;}
+.spct{font-size:10px;font-weight:500;color:var(--text);}
+.wcloud{min-height:110px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:9px 14px;padding:6px 0;}
+.wword{border-radius:4px;padding:3px 9px;font-weight:500;line-height:1.45;}
+.nodata{font-size:12px;color:var(--text3);font-style:italic;}
+.footer{text-align:center;font-size:12px;color:var(--text3);padding:1.25rem 0 .5rem;}
+.wc-note{font-size:11px;color:var(--text3);margin-top:10px;border-top:0.5px solid var(--border);padding-top:8px;}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="hdr">
+  <div>
+    <div class="htitle">AI and the future of our firm</div>
+    <div class="hsub">Live session responses</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+    <span id="lupd" style="font-size:12px;color:var(--text3);"></span>
+    <div class="lbadge"><div class="ldot"></div>Live</div>
+  </div>
+</div>
+
+
+
+<div class="mets">
+  <div class="met"><div class="mlbl">Responses</div><div class="mval" id="mr">0</div></div>
+  <div class="met"><div class="mlbl">Avg preparedness</div><div class="mval" id="mc">&#8212;</div></div>
+  <div class="met"><div class="mlbl">Top risk</div><div class="mval sm" id="mt">&#8212;</div></div>
+  <div class="met"><div class="mlbl">Optimists</div><div class="mval" id="mo">&#8212;</div></div>
+</div>
+
+<div class="qgrid" id="qgrid"></div>
+<div class="footer" id="rfi">Paste a Sheet URL above to go live, or click Demo mode to preview.</div>
+
+</div>
+<script>
+var WCC=[
+  ['#E1F5EE','#085041'],['#EEEDFE','#26215C'],['#FAECE7','#4A1B0C'],
+  ['#FAEEDA','#412402'],['#E6F1FB','#042C53'],['#EAF3DE','#173404'],
+  ['#FBEAF0','#4B1528'],['#F1EFE8','#2C2C2A'],['#FCEBEB','#501313'],['#E6F1FB','#042C53']
+];
+var COLS=['#1D9E75','#7F77DD','#D85A30','#BA7517','#378ADD','#0F6E56','#993C1D','#534AB7','#185FA5','#3B6D11','#993556','#854F0B','#A32D2D'];
+
+var QS=[
+  {id:'q1',text:'Are you more optimistic or pessimistic about AI\u2019s impact on the firm?',type:'bar',options:['Very optimistic','Cautiously optimistic','Neutral','Cautiously pessimistic','Very pessimistic']},
+  {id:'q2',text:'Which client segment are most likely to change how they instruct us because of AI?',type:'checkbox',options:['Large corporates','NGOs & civil society','Public sector','SMEs','Individuals','Philanthropy']},
+  {id:'q4',text:'Which services are most likely to be impacted by AI?',type:'checkbox',options:['Strategic advice','Legal & technology policy research','Investment due diligence','Data Protection Impact Assessments','Data Protection & Privacy Audit','Data Protection Training','AI Governance and Risk','GDPR and DSA Representation','Human Rights Impact Assessments','DPO Support Services','Strategic litigation','Legal advisory and research','Legal advice']},
+  {id:'q5',text:'Will AI adoption by competition force us to reduce our fees? If so, by how much?',type:'bar',options:['Under 10%','10–25%','25–50%','Over 50%','Not significantly','None - fees could increase']},
+  {id:'q7',text:'Which represents the biggest new opportunity AI creates for us?',type:'wordcloud'},
+  {id:'q8',text:'How prepared do you feel personally to be using AI tools?',type:'scale',labels:['1 Unprepared','2','3','4','5 Very prepared']},
+  {id:'q9',text:'What are the biggest risks AI poses to our firm?',type:'checkbox',options:['Fee pressure','Client in-housing','Competitor disruption','Loss of relevance','Our own slow adoption']}
+];
+
+var sheetUrl='https://docs.google.com/spreadsheets/d/e/2PACX-1vTr4_PQLQVTtxJTnHeiuRyqiAyafN1lK0LFVVTI1GhGPlwCYDzrjunO17Zt36v5alYNKiu5MeDJn6HC/pub?gid=2069070093&single=true&output=csv', timer=null;
+
+var DEMO_WC_WORDS=[
+  'AI governance','rights-based AI audits','tech litigation','new regulation work',
+  'AI ethics','policy advisory','human rights tech','due diligence','client education',
+  'AI governance','AI governance','rights-based AI audits','tech litigation','AI ethics','AI ethics'
+];
+
+function genDemo(n){
+  var rows=[];
+  for(var i=0;i<n;i++){
+    var row={};
+    QS.forEach(function(q){
+      if(q.type==='scale'){
+        var w=[.05,.1,.25,.35,.25],r=Math.random(),c=0;
+        for(var j=0;j<5;j++){c+=w[j];if(r<c){row[q.id]=j+1;break;}}
+      } else if(q.type==='wordcloud'){
+        row[q.id]=DEMO_WC_WORDS[Math.floor(Math.random()*DEMO_WC_WORDS.length)];
+      } else if(q.type==='checkbox'){
+        var picks=[];
+        var shuffled=q.options.slice().sort(function(){return Math.random()-.5;});
+        var num=Math.floor(Math.random()*3)+1;
+        for(var k=0;k<num&&k<shuffled.length;k++) picks.push(shuffled[k]);
+        row[q.id]=picks.join('; ');
+      } else {
+        row[q.id]=q.options[Math.floor(Math.random()*q.options.length)];
+      }
+    });
+    rows.push(row);
+  }
+  return rows;
+}
+
+function splitCSVLine(line){
+  var result=[],cur='',inQ=false;
+  for(var i=0;i<line.length;i++){
+    var ch=line[i];
+    if(ch==='"'){if(inQ&&line[i+1]==='"'){cur+='"';i++;}else inQ=!inQ;}
+    else if(ch===','&&!inQ){result.push(cur.trim());cur='';}
+    else{cur+=ch;}
+  }
+  result.push(cur.trim());
+  return result;
+}
+function normalise(s){return s.toLowerCase().replace(/[^a-z0-9]/g,'');}
+function parseCSV(csv){
+  var lines=csv.trim().replace(/\r\n/g,'\n').replace(/\r/g,'\n').split('\n');
+  if(lines.length<2) return [];
+  var hdrs=splitCSVLine(lines[0]).map(function(h){return h.replace(/^"|"$/g,'');});
+  var colMap={};
+  QS.forEach(function(q){
+    var qn=normalise(q.text.split('(')[0]);
+    var best=-1,bestScore=0;
+    hdrs.forEach(function(h,i){
+      var hn=normalise(h);
+      var score=0;
+      if(hn===qn){score=1000;}
+      else{
+        var words=qn.split('').slice(0,40).join('');
+        for(var k=8;k<=Math.min(qn.length,40);k++){
+          if(hn.indexOf(qn.substring(0,k))!==-1) score=k;
+        }
+      }
+      if(score>bestScore){bestScore=score;best=i;}
+    });
+    if(best>=0) colMap[q.id]=best;
+  });
+  var debugInfo='Column mapping: '+JSON.stringify(colMap)+' | Lines: '+lines.length+' | Cols: '+hdrs.length+' | Headers: '+hdrs.join(' || ');
+  document.getElementById('rfi').dataset.debug=debugInfo;
+  return lines.slice(1).filter(function(l){return l.trim().length>0;}).map(function(l){
+    var v=splitCSVLine(l);
+    var row={};
+    QS.forEach(function(q){
+      var ci=colMap[q.id];
+      row[q.id]=(ci!==undefined&&v[ci]!==undefined)?v[ci].replace(/^"|"$/g,'').trim():'';
+    });
+    return row;
+  });
+}
+
+function tally(rows,qid,opts){
+  var c={};opts.forEach(function(o){c[o]=0;});
+  rows.forEach(function(r){if(c[r[qid]]!==undefined)c[r[qid]]++;});
+  return c;
+}
+function tallyCheckbox(rows,qid,opts){
+  var c={};opts.forEach(function(o){c[o]=0;});
+  rows.forEach(function(r){
+    var val=(r[qid]||'');
+    var selections=val.split(/\s*[;,]\s*/).map(function(s){return s.trim();});
+    selections.forEach(function(s){if(c[s]!==undefined)c[s]++;});
+  });
+  return c;
+}
+function tallyScale(rows,qid){
+  var c={1:0,2:0,3:0,4:0,5:0};
+  rows.forEach(function(r){var v=parseInt(r[qid]);if(v>=1&&v<=5)c[v]++;});
+  return c;
+}
+function avg(rows,qid){
+  var s=0,n=0;
+  rows.forEach(function(r){var v=parseInt(r[qid]);if(v>=1&&v<=5){s+=v;n++;}});
+  return n?(s/n).toFixed(1):'&#8212;';
+}
+function tallyText(rows,qid){
+  var c={};
+  rows.forEach(function(r){
+    var raw=(r[qid]||'').trim().toLowerCase();
+    if(!raw) return;
+    var words=raw.split(/\s+/);
+    var STOP={a:1,an:1,the:1,and:1,or:1,of:1,to:1,in:1,is:1,it:1,for:1,on:1,with:1,our:1,us:1,we:1,be:1,at:1,by:1,as:1,this:1,that:1,from:1};
+    if(raw.split(/\s+/).length<=4){
+      c[raw]=(c[raw]||0)+1;
+    } else {
+      words.forEach(function(w){if(w.length>3&&!STOP[w]){c[w]=(c[w]||0)+1;}});
+    }
+  });
+  return c;
+}
+
+function renderBar(q,rows){
+  var c=tally(rows,q.id,q.options),tot=rows.length||1;
+  return q.options.map(function(o,i){
+    var pct=Math.round((c[o]/tot)*100);
+    return '<div class="brow"><div class="blbl">'+o+'</div><div class="btrk"><div class="bfil" style="width:'+pct+'%;background:'+COLS[i%COLS.length]+'"></div></div><div class="bpct">'+pct+'%</div></div>';
+  }).join('');
+}
+function renderCheckbox(q,rows){
+  var c=tallyCheckbox(rows,q.id,q.options);
+  var totalSelections=Object.values(c).reduce(function(a,b){return a+b;},0)||1;
+  var note='<div class="wc-note">Multiple selections allowed — percentages show share of all selections.</div>';
+  return q.options.map(function(o,i){
+    var pct=Math.round((c[o]/totalSelections)*100);
+    return '<div class="brow"><div class="blbl">'+o+'</div><div class="btrk"><div class="bfil" style="width:'+pct+'%;background:'+COLS[i%COLS.length]+'"></div></div><div class="bpct">'+pct+'%</div></div>';
+  }).join('')+note;
+}
+
+function renderScale(q,rows){
+  var c=tallyScale(rows,q.id),tot=rows.length||1;
+  var mx=Math.max.apply(null,Object.values(c).concat([1]));
+  return '<div class="srow2">'+[1,2,3,4,5].map(function(v,i){
+    var pct=Math.round((c[v]/tot)*100);
+    var h=Math.max(4,Math.round((c[v]/mx)*70));
+    return '<div class="scell"><div class="sbar" style="height:'+h+'px;background:'+COLS[i]+'22;border:1px solid '+COLS[i]+'55;"><span class="spct">'+pct+'%</span></div><div class="snum">'+q.labels[i]+'</div></div>';
+  }).join('')+'</div>';
+}
+
+function renderWordCloud(q,rows){
+  if(!rows.length) return '<div class="nodata">Waiting for responses...</div>';
+  var c=tallyText(rows,q.id);
+  var entries=Object.entries(c).sort(function(a,b){return b[1]-a[1];}).slice(0,30);
+  if(!entries.length) return '<div class="nodata">No text responses yet...</div>';
+  var mx=entries[0][1];
+  var html='<div class="wcloud">';
+  entries.forEach(function(e,i){
+    var sz=Math.round(12+(e[1]/mx)*24);
+    var pair=WCC[i%WCC.length];
+    html+='<span class="wword" style="font-size:'+sz+'px;background:'+pair[0]+';color:'+pair[1]+';">'+escHtml(e[0])+'</span>';
+  });
+  html+='</div>';
+  html+='<div class="wc-note">'+entries.length+' unique terms from '+rows.filter(function(r){return (r[q.id]||'').trim();}).length+' responses. Short phrases shown as-is; longer answers broken into keywords.</div>';
+  return html;
+}
+
+function escHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function updateMets(rows){
+  document.getElementById('mr').textContent=rows.length;
+  document.getElementById('mc').innerHTML=avg(rows,'q8')+'/5';
+  var q9=QS.find(function(q){return q.id==='q9';});
+  if(q9){var tc=tallyCheckbox(rows,'q9',q9.options);var top=Object.entries(tc).sort(function(a,b){return b[1]-a[1];})[0];document.getElementById('mt').textContent=top?top[0]:'—';}
+  var q1=QS.find(function(q){return q.id==='q1';});
+  if(q1){var oc=tally(rows,'q1',q1.options);var opt=(oc['Very optimistic']||0)+(oc['Cautiously optimistic']||0);document.getElementById('mo').textContent=rows.length?Math.round((opt/rows.length)*100)+'%':'—';}
+}
+
+function render(rows){
+  updateMets(rows);
+  document.getElementById('qgrid').innerHTML=QS.map(function(q,i){
+    var body;
+    if(!rows.length) body='<div class="nodata">Waiting for responses...</div>';
+    else if(q.type==='bar') body=renderBar(q,rows);
+    else if(q.type==='checkbox') body=renderCheckbox(q,rows);
+    else if(q.type==='scale') body=renderScale(q,rows);
+    else body=renderWordCloud(q,rows);
+    return '<div class="qcard"><div class="qnum">Q'+(i+1)+'</div><div class="qtxt">'+q.text+'</div>'+body+'</div>';
+  }).join('');
+  var now=new Date();
+  document.getElementById('lupd').textContent='Updated '+now.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+function fetchAndRender(){
+  fetch(sheetUrl).then(function(r){
+    if(!r.ok) throw new Error('HTTP '+r.status);
+    return r.text();
+  }).then(function(t){
+    var rows=parseCSV(t);
+    render(rows);
+    var dbg=document.getElementById('rfi').dataset.debug||'';
+    document.getElementById('rfi').textContent='Connected — '+rows.length+' response'+(rows.length!==1?'s':'')+'. Refreshing every 10 seconds. '+dbg;
+  }).catch(function(e){
+    document.getElementById('rfi').textContent='Fetch error: '+e.message+'. Check the URL is published publicly as CSV.';
+  });
+}
+
+function autoStart(){
+  fetchAndRender();
+  timer=setInterval(fetchAndRender,10000);
+}
+window.addEventListener('load', autoStart);
+</script>
+</body>
+</html>
